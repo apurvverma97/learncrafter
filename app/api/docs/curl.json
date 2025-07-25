@@ -1,0 +1,772 @@
+{
+	"info": {
+		"_postman_id": "learncrafter-mvp-api",
+		"name": "LearnCrafter MVP API",
+		"description": "Complete API collection for LearnCrafter MVP with Gemini AI integration. Includes all endpoints for course, module, and concept management with content generation.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "learncrafter-mvp"
+	},
+	"item": [
+		{
+			"name": "Health & Utility",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Check if the application is running and healthy"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Available Topics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/topics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"topics"
+							]
+						},
+						"description": "Get list of available course topics"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Available Levels",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/levels",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"levels"
+							]
+						},
+						"description": "Get list of available course levels"
+					},
+					"response": []
+				}
+			],
+			"description": "Basic health and utility endpoints"
+		},
+		{
+			"name": "Courses",
+			"item": [
+				{
+					"name": "Create Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Introduction to Python Programming\",\n  \"description\": \"Learn Python programming from scratch with hands-on projects\",\n  \"level\": \"beginner\",\n  \"topic\": \"programming\",\n  \"estimated_duration\": 120,\n  \"prerequisites\": [\"Basic computer skills\", \"No programming experience required\"],\n  \"learning_objectives\": [\"Understand Python syntax\", \"Write basic programs\", \"Use control structures\", \"Work with data structures\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses",
+								""
+							]
+						},
+						"description": "Create a new course. This will be the parent container for modules and concepts."
+					},
+					"response": []
+				},
+				{
+					"name": "List Courses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses/?page=1&size=10&level=beginner&topic=programming&search=python",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number for pagination"
+								},
+								{
+									"key": "size",
+									"value": "10",
+									"description": "Number of items per page"
+								},
+								{
+									"key": "level",
+									"value": "beginner",
+									"description": "Filter by course level"
+								},
+								{
+									"key": "topic",
+									"value": "programming",
+									"description": "Filter by course topic"
+								},
+								{
+									"key": "search",
+									"value": "python",
+									"description": "Search term for course title/description"
+								}
+							]
+						},
+						"description": "List all courses with optional filtering and pagination"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Course",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses/{{course_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses",
+								"{{course_id}}"
+							]
+						},
+						"description": "Get a specific course by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Course with Modules",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses/{{course_id}}/full",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses",
+								"{{course_id}}",
+								"full"
+							]
+						},
+						"description": "Get complete course with nested modules and concepts"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Course",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Python Course Title\",\n  \"description\": \"Updated course description with more details\",\n  \"level\": \"intermediate\",\n  \"estimated_duration\": 150\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses/{{course_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses",
+								"{{course_id}}"
+							]
+						},
+						"description": "Update an existing course"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Course",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses/{{course_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses",
+								"{{course_id}}"
+							]
+						},
+						"description": "Delete a course and all its associated modules and concepts"
+					},
+					"response": []
+				}
+			],
+			"description": "Course management endpoints"
+		},
+		{
+			"name": "Modules",
+			"item": [
+				{
+					"name": "Create Module",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"course_id\": \"{{course_id}}\",\n  \"title\": \"Python Basics\",\n  \"description\": \"Fundamental Python programming concepts\",\n  \"order_index\": 1,\n  \"estimated_duration\": 30,\n  \"learning_objectives\": [\"Understand variables\", \"Learn data types\", \"Master control flow\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/modules/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"modules",
+								""
+							]
+						},
+						"description": "Create a new module within a course"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Module",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/modules/{{module_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"modules",
+								"{{module_id}}"
+							]
+						},
+						"description": "Get a specific module by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Module with Concepts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/modules/{{module_id}}/full",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"modules",
+								"{{module_id}}",
+								"full"
+							]
+						},
+						"description": "Get module with all its nested concepts"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Module",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Module Title\",\n  \"description\": \"Updated module description\",\n  \"estimated_duration\": 45\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/modules/{{module_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"modules",
+								"{{module_id}}"
+							]
+						},
+						"description": "Update an existing module"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Module",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/modules/{{module_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"modules",
+								"{{module_id}}"
+							]
+						},
+						"description": "Delete a module and all its associated concepts"
+					},
+					"response": []
+				}
+			],
+			"description": "Module management endpoints"
+		},
+		{
+			"name": "Concepts",
+			"item": [
+				{
+					"name": "Create Concept (with Gemini Generation)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"module_id\": \"{{module_id}}\",\n  \"title\": \"Variables in Python\",\n  \"description\": \"Understanding variables, data types, and assignment in Python\",\n  \"order_index\": 1,\n  \"learning_objectives\": [\"Define variables\", \"Understand data types\", \"Use assignment operators\"],\n  \"prerequisites\": [\"Basic programming concepts\", \"Understanding of algorithms\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/concepts/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"concepts",
+								""
+							]
+						},
+						"description": "Create a new concept. This will trigger Gemini AI to generate interactive HTML content automatically."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Concept",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/concepts/{{concept_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"concepts",
+								"{{concept_id}}"
+							]
+						},
+						"description": "Get a specific concept by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Concept",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Concept Title\",\n  \"description\": \"Updated concept description\",\n  \"learning_objectives\": [\"Updated objective 1\", \"Updated objective 2\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/concepts/{{concept_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"concepts",
+								"{{concept_id}}"
+							]
+						},
+						"description": "Update an existing concept"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Concept",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/concepts/{{concept_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"concepts",
+								"{{concept_id}}"
+							]
+						},
+						"description": "Delete a concept"
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Content (Test)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Test Concept for Content Generation\",\n  \"description\": \"A test concept to verify Gemini content generation\",\n  \"module_context\": \"Test Module - Programming Basics\",\n  \"learning_objectives\": [\"Understand the concept\", \"Apply knowledge\", \"Practice with examples\"],\n  \"prerequisites\": [\"Basic understanding\", \"Willingness to learn\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/concepts/generate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"concepts",
+								"generate"
+							]
+						},
+						"description": "Test content generation without saving to database"
+					},
+					"response": []
+				},
+				{
+					"name": "Regenerate Content",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"feedback\": \"Make the content more interactive, add more visual examples, and include a practical exercise section\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/concepts/{{concept_id}}/regenerate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"concepts",
+								"{{concept_id}}",
+								"regenerate"
+							]
+						},
+						"description": "Regenerate content for an existing concept with feedback"
+					},
+					"response": []
+				},
+				{
+					"name": "Validate Content",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"<html><head><title>Test Content</title></head><body><h1>Hello World</h1><script>console.log('test');</script></body></html>\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/concepts/validate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"concepts",
+								"validate"
+							]
+						},
+						"description": "Validate HTML content for security and quality"
+					},
+					"response": []
+				}
+			],
+			"description": "Concept management and content generation endpoints"
+		},
+		{
+			"name": "Workflow Examples",
+			"item": [
+				{
+					"name": "Complete Course Creation Workflow",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Web Development Fundamentals\",\n  \"description\": \"Complete web development course covering HTML, CSS, and JavaScript\",\n  \"level\": \"beginner\",\n  \"topic\": \"web_development\",\n  \"estimated_duration\": 240,\n  \"prerequisites\": [\"Basic computer skills\", \"No programming experience required\"],\n  \"learning_objectives\": [\"Build responsive websites\", \"Understand web technologies\", \"Create interactive web applications\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses",
+								""
+							]
+						},
+						"description": "Step 1: Create a course. Use the returned course_id for subsequent requests."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Module for Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"course_id\": \"{{course_id}}\",\n  \"title\": \"HTML Fundamentals\",\n  \"description\": \"Learn HTML structure, elements, and semantic markup\",\n  \"order_index\": 1,\n  \"estimated_duration\": 60,\n  \"learning_objectives\": [\"HTML document structure\", \"Semantic elements\", \"Forms and inputs\", \"Accessibility basics\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/modules/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"modules",
+								""
+							]
+						},
+						"description": "Step 2: Create a module within the course. Use the returned module_id for concept creation."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Concept with AI Generation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"module_id\": \"{{module_id}}\",\n  \"title\": \"HTML Document Structure\",\n  \"description\": \"Understanding the basic structure of HTML documents including DOCTYPE, html, head, and body elements\",\n  \"order_index\": 1,\n  \"learning_objectives\": [\"DOCTYPE declaration\", \"HTML root element\", \"Head section elements\", \"Body section content\"],\n  \"prerequisites\": [\"Basic computer literacy\", \"Understanding of web browsers\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/concepts/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"concepts",
+								""
+							]
+						},
+						"description": "Step 3: Create a concept. This will automatically generate interactive HTML content using Gemini AI."
+					},
+					"response": []
+				},
+				{
+					"name": "View Complete Course",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses/{{course_id}}/full",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses",
+								"{{course_id}}",
+								"full"
+							]
+						},
+						"description": "Step 4: View the complete course with all modules and generated concepts"
+					},
+					"response": []
+				}
+			],
+			"description": "Complete workflow examples for creating courses, modules, and concepts"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Set default headers if needed",
+					"if (!pm.request.headers.has('Content-Type') && pm.request.method !== 'GET') {",
+					"    pm.request.headers.add({",
+					"        key: 'Content-Type',",
+					"        value: 'application/json'",
+					"    });",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Basic response validation",
+					"pm.test(\"Status code is 200 or 201\", function () {",
+					"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+					"});",
+					"",
+					"// Check if response has JSON content",
+					"if (pm.response.headers.get('Content-Type') && pm.response.headers.get('Content-Type').includes('application/json')) {",
+					"    pm.test(\"Response is valid JSON\", function () {",
+					"        pm.response.to.have.jsonBody();",
+					"    });",
+					"}",
+					"",
+					"// Auto-extract IDs for subsequent requests",
+					"if (pm.response.code === 201 && pm.response.json()) {",
+					"    const response = pm.response.json();",
+					"    if (response.id) {",
+					"        // Extract the resource type from the URL",
+					"        const urlParts = pm.request.url.getPath().split('/');",
+					"        const resourceType = urlParts[urlParts.length - 2]; // courses, modules, concepts",
+					"        const variableName = resourceType.slice(0, -1) + '_id'; // course_id, module_id, concept_id",
+					"        ",
+					"        pm.environment.set(variableName, response.id);",
+					"        console.log(`Auto-set ${variableName} = ${response.id}`);",
+					"    }",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string",
+			"description": "Base URL for the LearnCrafter MVP API"
+		},
+		{
+			"key": "course_id",
+			"value": "",
+			"type": "string",
+			"description": "Course ID (auto-populated when creating courses)"
+		},
+		{
+			"key": "module_id",
+			"value": "",
+			"type": "string",
+			"description": "Module ID (auto-populated when creating modules)"
+		},
+		{
+			"key": "concept_id",
+			"value": "",
+			"type": "string",
+			"description": "Concept ID (auto-populated when creating concepts)"
+		}
+	]
+}

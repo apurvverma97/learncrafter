@@ -1,0 +1,24 @@
+{
+  "prompts": {
+    "concept_generation": {
+      "file": "concept_generation.md",
+      "description": "Prompt for generating educational concept content",
+      "variables": ["title", "description", "objectives", "prerequisites", "module_context", "level"]
+    },
+    "concept_regeneration": {
+      "file": "concept_regeneration.md",
+      "description": "Prompt for regenerating existing concept content",
+      "variables": ["concept_title", "current_content", "feedback"]
+    },
+    "content_validation": {
+      "file": "content_validation.md",
+      "description": "Prompt for validating generated content",
+      "variables": ["content"]
+    },
+    "safety_check": {
+      "file": "safety_check.md",
+      "description": "Prompt for safety validation of content",
+      "variables": ["content"]
+    }
+  }
+} 
