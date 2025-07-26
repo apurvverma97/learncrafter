@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Query, Path
 from typing import List, Optional
 from app.models.schemas import (
     CourseCreate, CourseUpdate, CourseResponse, CourseWithModules,
-    PaginationParams, PaginatedResponse
+    PaginationParams, PaginatedCourseResponse
 )
 from app.services.database import db_service
 from app.models.schemas import CourseLevel, CourseTopic
@@ -30,35 +30,25 @@ async def create_course(course: CourseCreate):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/", response_model=PaginatedResponse)
+@router.get("/", response_model=PaginatedCourseResponse)
 async def list_courses(
     page: int = Query(1, ge=1, description="Page number"),
     size: int = Query(20, ge=1, le=100, description="Page size"),
     topic: Optional[CourseTopic] = Query(None, description="Filter by topic"),
-    level: Optional[CourseLevel] = Query(None, description="Filter by level")
+    level: Optional[CourseLevel] = Query(None, description="Filter by level"),
+    search: Optional[str] = Query(None, description="Search term for title/description")
 ):
     """List courses with pagination and filtering."""
     try:
-        # Get courses with pagination
-        courses = await db_service.list_courses(page, size)
-        total = await db_service.count_courses()
-        
-        # Apply filters if provided
-        if topic or level:
-            filtered_courses = []
-            for course in courses:
-                if topic and course.get('topic') != topic:
-                    continue
-                if level and course.get('level') != level:
-                    continue
-                filtered_courses.append(course)
-            courses = filtered_courses
+        # Get courses with pagination and filtering from the database service
+        courses_data = await db_service.list_courses(page, size, topic, level, search)
+        total = await db_service.count_courses(topic, level, search)
         
         # Calculate pagination metadata
-        pages = (total + size - 1) // size
+        pages = (total + size - 1) // size if total > 0 else 0
         
-        return PaginatedResponse(
-            items=[CourseResponse(**course) for course in courses],
+        return PaginatedCourseResponse(
+            courses=[CourseResponse(**course) for course in courses_data],
             total=total,
             page=page,
             size=size,

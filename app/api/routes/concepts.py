@@ -62,6 +62,7 @@ async def get_concept(concept_id: str = Path(..., description="Concept ID")):
         concept = await db_service.get_concept(concept_id)
         if not concept:
             raise HTTPException(status_code=404, detail="Concept not found")
+        logger.info(f"Concept from DB: {concept}")
         return ConceptResponse(**concept)
     except HTTPException:
         raise

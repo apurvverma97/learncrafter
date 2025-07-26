@@ -57,20 +57,50 @@ class DatabaseService:
             logger.error(f"Failed to delete course {course_id}: {e}")
             raise
     
-    async def list_courses(self, page: int = 1, size: int = 20) -> List[Dict[str, Any]]:
-        """List courses with pagination."""
+    async def list_courses(
+        self, 
+        page: int = 1, 
+        size: int = 20, 
+        topic: Optional[str] = None, 
+        level: Optional[str] = None, 
+        search: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
+        """List courses with pagination and filtering."""
         try:
             offset = (page - 1) * size
-            response = self.client.table('courses').select('*').order('created_at', desc=True).range(offset, offset + size - 1).execute()
+            query = self.client.table('courses').select('*').order('created_at', desc=True)
+            
+            if topic:
+                query = query.eq('topic', topic)
+            if level:
+                query = query.eq('level', level)
+            if search:
+                query = query.or_(f"title.ilike.%{search}%,description.ilike.%{search}%")
+            
+            response = query.range(offset, offset + size - 1).execute()
             return response.data
         except Exception as e:
             logger.error(f"Failed to list courses: {e}")
             raise
     
-    async def count_courses(self) -> int:
-        """Count total courses."""
+    async def count_courses(
+        self, 
+        topic: Optional[str] = None, 
+        level: Optional[str] = None, 
+        search: Optional[str] = None
+    ) -> int:
+        """Count total courses with filtering."""
         try:
-            response = self.client.table('courses').select('id', count='exact').execute()
+            query = self.client.table('courses').select('id', count='exact')
+            
+            if topic:
+                query = query.eq('topic', topic)
+            if level:
+                query = query.eq('level', level)
+            if search:
+                query = query.or_(f"title.ilike.%{search}%,description.ilike.%{search}%")
+            
+            response = query.execute()
             return response.count or 0
         except Exception as e:
             logger.error(f"Failed to count courses: {e}")

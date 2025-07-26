@@ -35,6 +35,7 @@ async def get_module(module_id: str = Path(..., description="Module ID")):
         module = await db_service.get_module(module_id)
         if not module:
             raise HTTPException(status_code=404, detail="Module not found")
+        logger.info(f"Module from DB: {module}")
         return ModuleResponse(**module)
     except HTTPException:
         raise
@@ -51,10 +52,12 @@ async def get_module_with_concepts(module_id: str = Path(..., description="Modul
         module = await db_service.get_module(module_id)
         if not module:
             raise HTTPException(status_code=404, detail="Module not found")
+        logger.info(f"Module from DB: {module}")
         
         # Get concepts for this module
         from app.models.schemas import ConceptResponse
         concepts = await db_service.get_concepts_by_module(module_id)
+        logger.info(f"Concepts for module {module_id} from DB: {concepts}")
         concept_responses = [ConceptResponse(**concept) for concept in concepts]
         
         # Create module with concepts response

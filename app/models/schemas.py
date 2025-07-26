@@ -205,9 +205,9 @@ class PaginationParams(BaseSchema):
     size: int = Field(default=20, ge=1, le=100, description="Page size")
 
 
-class PaginatedResponse(BaseSchema):
-    """Schema for paginated responses."""
-    items: List[BaseSchema]
+class PaginatedCourseResponse(BaseSchema):
+    """Schema for paginated course responses."""
+    courses: List[CourseResponse]
     total: int
     page: int
     size: int
