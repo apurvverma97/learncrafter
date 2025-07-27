@@ -39,6 +39,7 @@ LearnCrafter MVP follows **SOLID principles** with a clean, layered architecture
   - `LLMService`: Only AI content generation
   - `ValidationService`: Only content validation
   - `PromptService`: Only prompt generation
+  - `CourseService`: Handles AI-powered course content and structure generation
 
 ### 2. **Open/Closed Principle (OCP)**
 - Services are open for extension, closed for modification

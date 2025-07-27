@@ -2,222 +2,168 @@
 Database service for LearnCrafter MVP.
 Single Responsibility: Database operations only.
 """
-from typing import Optional, List, Dict, Any
-from supabase import create_client, Client
-from app.core.config import settings
+
 import logging
+from typing import Any, Dict, List, Optional
+
+from app.repositories.supabase import SupabaseDAO
 
 logger = logging.getLogger(__name__)
 
 
 class DatabaseService:
-    """Database service for Supabase operations."""
-    
-    def __init__(self):
-        """Initialize Supabase client."""
-        self.client: Client = create_client(
-            settings.supabase_url,
-            settings.supabase_key
-        )
-    
-    # Course Operations
+    """Orchestrates database operations using a DAO."""
+
+    def __init__(self, dao: Optional[SupabaseDAO] = None):
+        """Initialize the service with a DAO instance."""
+        self.dao = dao or SupabaseDAO()
+
     async def create_course(self, course_data: Dict[str, Any]) -> str:
         """Create a new course."""
-        try:
-            response = self.client.table('courses').insert(course_data).execute()
-            return response.data[0]['id']
-        except Exception as e:
-            logger.error(f"Failed to create course: {e}")
-            raise
-    
+        result = self.dao.insert("courses", course_data)
+        return result["id"]
+
     async def get_course(self, course_id: str) -> Optional[Dict[str, Any]]:
-        """Get a course by ID."""
-        try:
-            response = self.client.table('courses').select('*').eq('id', course_id).execute()
-            return response.data[0] if response.data else None
-        except Exception as e:
-            logger.error(f"Failed to get course {course_id}: {e}")
-            raise
-    
-    async def update_course(self, course_id: str, update_data: Dict[str, Any]) -> bool:
-        """Update a course."""
-        try:
-            response = self.client.table('courses').update(update_data).eq('id', course_id).execute()
-            return len(response.data) > 0
-        except Exception as e:
-            logger.error(f"Failed to update course {course_id}: {e}")
-            raise
-    
+        """Get a specific course by ID."""
+        return self.dao.get("courses", {"id": course_id})
+
+    async def get_course_by_title(self, course_title: str) -> Optional[Dict[str, Any]]:
+        """Get a specific course by title."""
+        return self.dao.get("courses", {"title": course_title})
+
+    async def update_course(self, course_id: str, course_data: Dict[str, Any]) -> bool:
+        """Update an existing course."""
+        return self.dao.update("courses", {"id": course_id}, course_data)
+
     async def delete_course(self, course_id: str) -> bool:
-        """Delete a course (cascades to modules and concepts)."""
-        try:
-            response = self.client.table('courses').delete().eq('id', course_id).execute()
-            return len(response.data) > 0
-        except Exception as e:
-            logger.error(f"Failed to delete course {course_id}: {e}")
-            raise
-    
+        """Delete a course."""
+        return self.dao.delete("courses", {"id": course_id})
+
     async def list_courses(
-        self, 
-        page: int = 1, 
-        size: int = 20, 
-        topic: Optional[str] = None, 
-        level: Optional[str] = None, 
-        search: Optional[str] = None
+        self,
+        level: Optional[str] = None,
+        topic: Optional[str] = None,
+        search: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
-        """List courses with pagination and filtering."""
-        try:
-            offset = (page - 1) * size
-            query = self.client.table('courses').select('*').order('created_at', desc=True)
-            
-            if topic:
-                query = query.eq('topic', topic)
-            if level:
-                query = query.eq('level', level)
-            if search:
-                query = query.or_(f"title.ilike.%{search}%,description.ilike.%{search}%")
-            
-            response = query.range(offset, offset + size - 1).execute()
-            return response.data
-        except Exception as e:
-            logger.error(f"Failed to list courses: {e}")
-            raise
-    
+        """List all courses with optional filtering."""
+        filters = {}
+        if level:
+            filters["level"] = level
+        if topic:
+            filters["topic"] = topic
+        if search:
+            filters["title"] = f"%{search}%"
+        return self.dao.list_query("courses", filters)
+
     async def count_courses(
-        self, 
-        topic: Optional[str] = None, 
-        level: Optional[str] = None, 
-        search: Optional[str] = None
+        self,
+        level: Optional[str] = None,
+        topic: Optional[str] = None,
+        search: Optional[str] = None,
     ) -> int:
-        """Count total courses with filtering."""
-        try:
-            query = self.client.table('courses').select('id', count='exact')
-            
-            if topic:
-                query = query.eq('topic', topic)
-            if level:
-                query = query.eq('level', level)
-            if search:
-                query = query.or_(f"title.ilike.%{search}%,description.ilike.%{search}%")
-            
-            response = query.execute()
-            return response.count or 0
-        except Exception as e:
-            logger.error(f"Failed to count courses: {e}")
-            raise
-    
-    # Module Operations
+        """Count all courses with optional filtering."""
+        filters = {}
+        if level:
+            filters["level"] = level
+        if topic:
+            filters["topic"] = topic
+        if search:
+            filters["title"] = f"%{search}%"
+        return self.dao.count_query("courses", filters)
+
     async def create_module(self, module_data: Dict[str, Any]) -> str:
         """Create a new module."""
-        try:
-            response = self.client.table('modules').insert(module_data).execute()
-            return response.data[0]['id']
-        except Exception as e:
-            logger.error(f"Failed to create module: {e}")
-            raise
-    
+        result = self.dao.insert("modules", module_data)
+        return result["id"]
+
     async def get_module(self, module_id: str) -> Optional[Dict[str, Any]]:
-        """Get a module by ID."""
-        try:
-            response = self.client.table('modules').select('*').eq('id', module_id).execute()
-            return response.data[0] if response.data else None
-        except Exception as e:
-            logger.error(f"Failed to get module {module_id}: {e}")
-            raise
-    
+        """Get a specific module by ID."""
+        return self.dao.get("modules", {"id": module_id})
+
     async def get_modules_by_course(self, course_id: str) -> List[Dict[str, Any]]:
-        """Get all modules for a course."""
-        try:
-            response = self.client.table('modules').select('*').eq('course_id', course_id).order('order_index').execute()
-            return response.data
-        except Exception as e:
-            logger.error(f"Failed to get modules for course {course_id}: {e}")
-            raise
-    
-    async def update_module(self, module_id: str, update_data: Dict[str, Any]) -> bool:
-        """Update a module."""
-        try:
-            response = self.client.table('modules').update(update_data).eq('id', module_id).execute()
-            return len(response.data) > 0
-        except Exception as e:
-            logger.error(f"Failed to update module {module_id}: {e}")
-            raise
-    
+        """Get all modules for a given course."""
+        return self.dao.list_query("modules", {"course_id": course_id}, order_by="order_index")
+
+    async def update_module(self, module_id: str, module_data: Dict[str, Any]) -> bool:
+        """Update an existing module."""
+        return self.dao.update("modules", {"id": module_id}, module_data)
+
     async def delete_module(self, module_id: str) -> bool:
-        """Delete a module (cascades to concepts)."""
-        try:
-            response = self.client.table('modules').delete().eq('id', module_id).execute()
-            return len(response.data) > 0
-        except Exception as e:
-            logger.error(f"Failed to delete module {module_id}: {e}")
-            raise
-    
-    # Concept Operations
+        """Delete a module."""
+        return self.dao.delete("modules", {"id": module_id})
+
     async def create_concept(self, concept_data: Dict[str, Any]) -> str:
         """Create a new concept."""
-        try:
-            response = self.client.table('concepts').insert(concept_data).execute()
-            return response.data[0]['id']
-        except Exception as e:
-            logger.error(f"Failed to create concept: {e}")
-            raise
-    
+        result = self.dao.insert("concepts", concept_data)
+        return result["id"]
+
     async def get_concept(self, concept_id: str) -> Optional[Dict[str, Any]]:
-        """Get a concept by ID."""
-        try:
-            response = self.client.table('concepts').select('*').eq('id', concept_id).execute()
-            return response.data[0] if response.data else None
-        except Exception as e:
-            logger.error(f"Failed to get concept {concept_id}: {e}")
-            raise
-    
+        """Get a specific concept by ID."""
+        return self.dao.get("concepts", {"id": concept_id})
+
     async def get_concepts_by_module(self, module_id: str) -> List[Dict[str, Any]]:
-        """Get all concepts for a module."""
-        try:
-            response = self.client.table('concepts').select('*').eq('module_id', module_id).order('order_index').execute()
-            return response.data
-        except Exception as e:
-            logger.error(f"Failed to get concepts for module {module_id}: {e}")
-            raise
-    
-    async def update_concept(self, concept_id: str, update_data: Dict[str, Any]) -> bool:
-        """Update a concept."""
-        try:
-            response = self.client.table('concepts').update(update_data).eq('id', concept_id).execute()
-            return len(response.data) > 0
-        except Exception as e:
-            logger.error(f"Failed to update concept {concept_id}: {e}")
-            raise
-    
+        """Get all concepts for a given module."""
+        return self.dao.list_query("concepts", {"module_id": module_id}, order_by="order_index")
+
+    async def update_concept(self, concept_id: str, concept_data: Dict[str, Any]) -> bool:
+        """Update an existing concept."""
+        return self.dao.update("concepts", {"id": concept_id}, concept_data)
+
     async def delete_concept(self, concept_id: str) -> bool:
         """Delete a concept."""
-        try:
-            response = self.client.table('concepts').delete().eq('id', concept_id).execute()
-            return len(response.data) > 0
-        except Exception as e:
-            logger.error(f"Failed to delete concept {concept_id}: {e}")
-            raise
-    
-    # Nested Queries
+        return self.dao.delete("concepts", {"id": concept_id})
+
+    async def create_prompt(self, prompt_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a new prompt."""
+        return self.dao.insert("prompts", prompt_data)
+
+    async def get_prompt(self, prompt_id: str) -> Optional[Dict[str, Any]]:
+        """Get a specific prompt by ID."""
+        return self.dao.get("prompts", {"prompt_id": prompt_id})
+
+    async def list_prompts(self) -> List[Dict[str, Any]]:
+        """List all prompts."""
+        return self.dao.list_query("prompts")
+
+    async def update_prompt(self, prompt_id: str, prompt_data: Dict[str, Any]) -> bool:
+        """Update an existing prompt."""
+        return self.dao.update("prompts", {"prompt_id": prompt_id}, prompt_data)
+
+    async def delete_prompt(self, prompt_id: str) -> bool:
+        """Delete a prompt."""
+        return self.dao.delete("prompts", {"prompt_id": prompt_id})
+
     async def get_course_with_modules(self, course_id: str) -> Optional[Dict[str, Any]]:
-        """Get complete course with nested modules and concepts."""
+        """Get a course with all its modules and concepts."""
         try:
-            # Get course
-            course = await self.get_course(course_id)
+            # Get the course
+            course = self.dao.get("courses", {"id": course_id})
             if not course:
                 return None
-            
-            # Get modules with concepts
-            modules = await self.get_modules_by_course(course_id)
+
+            # Get modules for this course
+            modules = self.dao.list_query(
+                "modules", {"course_id": course_id}, order_by="order_index"
+            )
+
+            # Get concepts for each module
             for module in modules:
-                module['concepts'] = await self.get_concepts_by_module(module['id'])
-            
-            course['modules'] = modules
+                concepts = self.dao.list_query(
+                    "concepts", {"module_id": module["id"]}, order_by="order_index"
+                )
+                module["concepts"] = concepts
+
+            course["modules"] = modules
             return course
         except Exception as e:
             logger.error(f"Failed to get course with modules {course_id}: {e}")
-            raise
+            return None
 
 
 # Global database service instance
-db_service = DatabaseService() 
+db_service = DatabaseService()
+
+
+def get_db_service() -> DatabaseService:
+    """Get the global database service instance."""
+    return db_service

@@ -2,20 +2,22 @@
 Main FastAPI application for LearnCrafter MVP.
 Dependency Inversion: Depends on abstractions, not concrete implementations.
 """
-from fastapi import FastAPI, HTTPException
+
+import logging
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from contextlib import asynccontextmanager
-import logging
 
+from app.api.routes import concepts, courses, modules, prompts
 from app.core.config import settings
-from app.api.routes import courses, modules, concepts, prompts
 from app.models.schemas import CourseLevel, CourseTopic
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -37,7 +39,7 @@ app = FastAPI(
     description="Interactive Content Generator System MVP",
     docs_url="/docs",
     redoc_url="/redoc",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Add CORS middleware
@@ -55,10 +57,7 @@ app.add_middleware(
 async def global_exception_handler(request, exc):
     """Global exception handler for unhandled exceptions."""
     logger.error(f"Unhandled exception: {exc}")
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "Internal server error"}
-    )
+    return JSONResponse(status_code=500, content={"detail": "Internal server error"})
 
 
 # Health check endpoint
@@ -68,7 +67,7 @@ async def health_check():
     return {
         "status": "healthy",
         "app": settings.app_name,
-        "version": settings.app_version
+        "version": settings.app_version,
     }
 
 
@@ -78,7 +77,10 @@ async def get_topics():
     """Get available course topics."""
     return {
         "topics": [
-            {"value": topic.value, "label": topic.value.replace("-", " ").title()}
+            {
+                "value": topic.value,
+                "label": topic.value.replace("-", " ").title(),
+            }
             for topic in CourseTopic
         ]
     }
@@ -88,10 +90,7 @@ async def get_topics():
 async def get_levels():
     """Get available course levels."""
     return {
-        "levels": [
-            {"value": level.value, "label": level.value.title()}
-            for level in CourseLevel
-        ]
+        "levels": [{"value": level.value, "label": level.value.title()} for level in CourseLevel]
     }
 
 
@@ -110,15 +109,16 @@ async def root():
         "message": "Welcome to LearnCrafter MVP",
         "version": settings.app_version,
         "docs": "/docs",
-        "health": "/health"
+        "health": "/health",
     }
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
         port=8000,
-        reload=settings.debug
-    ) 
+        reload=settings.debug,
+    )

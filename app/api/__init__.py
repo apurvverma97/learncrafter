@@ -1,1 +1,1 @@
-# API package for LearnCrafter MVP HTTP endpoints 
+# API package for LearnCrafter MVP HTTP endpoints

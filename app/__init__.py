@@ -1,1 +1,1 @@
-# LearnCrafter MVP - Main Application Package 
+# LearnCrafter MVP - Main Application Package

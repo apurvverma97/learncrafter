@@ -1,1 +1,1 @@
-# Core package for LearnCrafter MVP 
+# Core package for LearnCrafter MVP

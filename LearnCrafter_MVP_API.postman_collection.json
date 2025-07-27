@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "learncrafter-mvp-api",
 		"name": "LearnCrafter MVP API",
-		"description": "Complete API collection for LearnCrafter MVP with Gemini AI integration. Includes all endpoints for course, module, and concept management with content generation.",
+		"description": "Complete API collection for LearnCrafter MVP with Gemini AI integration. Includes all endpoints for course, module, concept, and prompt management with content generation.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "learncrafter-mvp"
 	},
@@ -10,6 +10,24 @@
 		{
 			"name": "Health & Utility",
 			"item": [
+				{
+					"name": "Root Endpoint",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								""
+							]
+						},
+						"description": "Get API information and available endpoints"
+					},
+					"response": []
+				},
 				{
 					"name": "Health Check",
 					"request": {
@@ -70,6 +88,59 @@
 		{
 			"name": "Courses",
 			"item": [
+				{
+					"name": "Create Course Publishing Job",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"topic\": \"programming\",\n  \"level\": \"beginner\",\n  \"course_title\": \"Complete Web Development Course\",\n  \"course_description\": \"A comprehensive web development course covering HTML, CSS, JavaScript, and modern frameworks\",\n  \"num_modules\": 3,\n  \"concepts_per_module\": 5,\n  \"modules\": [\n    {\n      \"title\": \"HTML Fundamentals\",\n      \"description\": \"Learn HTML structure, elements, and semantic markup\",\n      \"concepts\": [\n        {\n          \"title\": \"HTML Document Structure\",\n          \"description\": \"Understanding the basic structure of HTML documents\",\n          \"learning_objectives\": [\"DOCTYPE declaration\", \"HTML root element\", \"Head section elements\", \"Body section content\"],\n          \"prerequisites\": [\"Basic computer literacy\", \"Understanding of web browsers\"]\n        }\n      ]\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses/publishJob",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses",
+								"publishJob"
+							]
+						},
+						"description": "Start an asynchronous job to create a complete course with modules and concepts. This is the recommended way to create full courses."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Job Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courses/publishJob/{{job_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"courses",
+								"publishJob",
+								"{{job_id}}",
+								"status"
+							]
+						},
+						"description": "Get the status and progress of a course publishing job"
+					},
+					"response": []
+				},
 				{
 					"name": "Create Course",
 					"request": {
@@ -305,7 +376,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/v1/modules/{{module_id}}/full",
+							"raw": "{{base_url}}/api/v1/modules/{{module_id}}/concepts",
 							"host": [
 								"{{base_url}}"
 							],
@@ -314,7 +385,7 @@
 								"v1",
 								"modules",
 								"{{module_id}}",
-								"full"
+								"concepts"
 							]
 						},
 						"description": "Get module with all its nested concepts"
@@ -393,7 +464,7 @@
 							"raw": "{\n  \"module_id\": \"{{module_id}}\",\n  \"title\": \"Variables in Python\",\n  \"description\": \"Understanding variables, data types, and assignment in Python\",\n  \"order_index\": 1,\n  \"learning_objectives\": [\"Define variables\", \"Understand data types\", \"Use assignment operators\"],\n  \"prerequisites\": [\"Basic programming concepts\", \"Understanding of algorithms\"]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/v1/concepts/",
+							"raw": "{{base_url}}/api/v1/concepts/?workflow_step=concept_generation",
 							"host": [
 								"{{base_url}}"
 							],
@@ -402,9 +473,16 @@
 								"v1",
 								"concepts",
 								""
+							],
+							"query": [
+								{
+									"key": "workflow_step",
+									"value": "concept_generation",
+									"description": "Workflow step for prompt selection"
+								}
 							]
 						},
-						"description": "Create a new concept. This will trigger Gemini AI to generate interactive HTML content automatically."
+						"description": "Create a new concept. This will trigger Gemini AI to generate interactive HTML content automatically using the specified workflow step."
 					},
 					"response": []
 				},
@@ -455,7 +533,7 @@
 								"{{concept_id}}"
 							]
 						},
-						"description": "Update an existing concept"
+						"description": "Update an existing concept (metadata only, not content)"
 					},
 					"response": []
 				},
@@ -495,7 +573,7 @@
 							"raw": "{\n  \"title\": \"Test Concept for Content Generation\",\n  \"description\": \"A test concept to verify Gemini content generation\",\n  \"module_context\": \"Test Module - Programming Basics\",\n  \"learning_objectives\": [\"Understand the concept\", \"Apply knowledge\", \"Practice with examples\"],\n  \"prerequisites\": [\"Basic understanding\", \"Willingness to learn\"]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/v1/concepts/generate",
+							"raw": "{{base_url}}/api/v1/concepts/generate?workflow_step=concept_generation",
 							"host": [
 								"{{base_url}}"
 							],
@@ -504,9 +582,16 @@
 								"v1",
 								"concepts",
 								"generate"
+							],
+							"query": [
+								{
+									"key": "workflow_step",
+									"value": "concept_generation",
+									"description": "Workflow step for prompt selection"
+								}
 							]
 						},
-						"description": "Test content generation without saving to database"
+						"description": "Test content generation without saving to database using the specified workflow step"
 					},
 					"response": []
 				},
@@ -525,7 +610,7 @@
 							"raw": "{\n  \"feedback\": \"Make the content more interactive, add more visual examples, and include a practical exercise section\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/v1/concepts/{{concept_id}}/regenerate",
+							"raw": "{{base_url}}/api/v1/concepts/{{concept_id}}/regenerate?workflow_step=concept_regeneration",
 							"host": [
 								"{{base_url}}"
 							],
@@ -535,14 +620,100 @@
 								"concepts",
 								"{{concept_id}}",
 								"regenerate"
+							],
+							"query": [
+								{
+									"key": "workflow_step",
+									"value": "concept_regeneration",
+									"description": "Workflow step for prompt selection"
+								}
 							]
 						},
-						"description": "Regenerate content for an existing concept with feedback"
+						"description": "Regenerate content for an existing concept with feedback using the specified workflow step"
 					},
 					"response": []
 				},
 				{
-					"name": "Validate Content",
+					"name": "Validate Concept Content",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/concepts/{{concept_id}}/validate?workflow_step=content_validation",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"concepts",
+								"{{concept_id}}",
+								"validate"
+							],
+							"query": [
+								{
+									"key": "workflow_step",
+									"value": "content_validation",
+									"description": "Workflow step for prompt selection"
+								}
+							]
+						},
+						"description": "Validate HTML content of an existing concept for security and quality using the specified workflow step"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Valid Prompt IDs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/concepts/prompts/valid-ids",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"concepts",
+								"prompts",
+								"valid-ids"
+							]
+						},
+						"description": "Get list of valid prompt IDs from the database"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Workflow Step Mapping",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/concepts/prompts/workflow-steps",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"concepts",
+								"prompts",
+								"workflow-steps"
+							]
+						},
+						"description": "Get mapping of workflow steps to prompt IDs"
+					},
+					"response": []
+				}
+			],
+			"description": "Concept management and content generation endpoints"
+		},
+		{
+			"name": "Prompts",
+			"item": [
+				{
+					"name": "Create Prompt",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -553,26 +724,119 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"content\": \"<html><head><title>Test Content</title></head><body><h1>Hello World</h1><script>console.log('test');</script></body></html>\"\n}"
+							"raw": "{\n  \"prompt_id\": \"concept_generation_v2\",\n  \"title\": \"Enhanced Concept Generation Prompt\",\n  \"description\": \"Improved prompt for generating interactive concept content\",\n  \"content\": \"Create an interactive HTML lesson for {{title}}. Include examples, exercises, and visual elements.\",\n  \"category\": \"content_generation\",\n  \"version\": \"2.0\",\n  \"is_active\": true\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/v1/concepts/validate",
+							"raw": "{{base_url}}/api/v1/prompts/",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"concepts",
-								"validate"
+								"prompts",
+								""
 							]
 						},
-						"description": "Validate HTML content for security and quality"
+						"description": "Create a new prompt template for content generation"
+					},
+					"response": []
+				},
+				{
+					"name": "List Prompts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/prompts/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"prompts",
+								""
+							]
+						},
+						"description": "List all available prompt templates"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Prompt",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/prompts/{{prompt_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"prompts",
+								"{{prompt_id}}"
+							]
+						},
+						"description": "Get a specific prompt template by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Prompt",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Prompt Title\",\n  \"description\": \"Updated prompt description\",\n  \"content\": \"Updated prompt content with improved instructions\",\n  \"version\": \"2.1\",\n  \"is_active\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/prompts/{{prompt_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"prompts",
+								"{{prompt_id}}"
+							]
+						},
+						"description": "Update an existing prompt template"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Prompt",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/prompts/{{prompt_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"prompts",
+								"{{prompt_id}}"
+							]
+						},
+						"description": "Delete a prompt template"
 					},
 					"response": []
 				}
 			],
-			"description": "Concept management and content generation endpoints"
+			"description": "Prompt template management endpoints"
 		},
 		{
 			"name": "Workflow Examples",
@@ -589,7 +853,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"title\": \"Web Development Fundamentals\",\n  \"description\": \"Complete web development course covering HTML, CSS, and JavaScript\",\n  \"level\": \"beginner\",\n  \"topic\": \"web_development\",\n  \"estimated_duration\": 240,\n  \"prerequisites\": [\"Basic computer skills\", \"No programming experience required\"],\n  \"learning_objectives\": [\"Build responsive websites\", \"Understand web technologies\", \"Create interactive web applications\"]\n}"
+							"raw": "{\n  \"title\": \"Web Development Fundamentals\",\n  \"description\": \"Complete web development course covering HTML, CSS, and JavaScript\",\n  \"level\": \"beginner\",\n  \"topic\": \"programming\",\n  \"estimated_duration\": 240,\n  \"prerequisites\": [\"Basic computer skills\", \"No programming experience required\"],\n  \"learning_objectives\": [\"Build responsive websites\", \"Understand web technologies\", \"Create interactive web applications\"]\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/courses/",
@@ -716,7 +980,7 @@
 				"exec": [
 					"// Basic response validation",
 					"pm.test(\"Status code is 200 or 201\", function () {",
-					"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+					"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
 					"});",
 					"",
 					"// Check if response has JSON content",
@@ -732,11 +996,20 @@
 					"    if (response.id) {",
 					"        // Extract the resource type from the URL",
 					"        const urlParts = pm.request.url.getPath().split('/');",
-					"        const resourceType = urlParts[urlParts.length - 2]; // courses, modules, concepts",
-					"        const variableName = resourceType.slice(0, -1) + '_id'; // course_id, module_id, concept_id",
+					"        const resourceType = urlParts[urlParts.length - 2]; // courses, modules, concepts, prompts",
+					"        const variableName = resourceType.slice(0, -1) + '_id'; // course_id, module_id, concept_id, prompt_id",
 					"        ",
 					"        pm.environment.set(variableName, response.id);",
 					"        console.log(`Auto-set ${variableName} = ${response.id}`);",
+					"    }",
+					"}",
+					"",
+					"// Handle job responses",
+					"if (pm.response.code === 202 && pm.response.json()) {",
+					"    const response = pm.response.json();",
+					"    if (response.job_id) {",
+					"        pm.environment.set('job_id', response.job_id);",
+					"        console.log(`Auto-set job_id = ${response.job_id}`);",
 					"    }",
 					"}"
 				]
@@ -767,6 +1040,18 @@
 			"value": "",
 			"type": "string",
 			"description": "Concept ID (auto-populated when creating concepts)"
+		},
+		{
+			"key": "prompt_id",
+			"value": "",
+			"type": "string",
+			"description": "Prompt ID (auto-populated when creating prompts)"
+		},
+		{
+			"key": "job_id",
+			"value": "",
+			"type": "string",
+			"description": "Job ID (auto-populated when creating publishing jobs)"
 		}
 	]
 } 

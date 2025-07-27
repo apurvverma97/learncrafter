@@ -1,1 +1,1 @@
-# Data models package for LearnCrafter MVP 
+# Data models package for LearnCrafter MVP

@@ -1,1 +1,1 @@
-# Services package for LearnCrafter MVP business logic 
+# Services package for LearnCrafter MVP business logic
